@@ -1,0 +1,55 @@
+from typing import Optional, Callable
+
+import time
+from threading import Timer
+
+from session.domain.session_part import SessionPart
+
+class Session:
+    def __init__(self) -> None:
+        self.part: SessionPart = SessionPart.WAITING_START
+        self.timer = None
+
+    def start(self) -> None:
+        self.part = SessionPart.READ_COMP
+        self.wait_and_proceed(lambda: self.enter_homework(), seconds=10)
+
+    def enter_homework(self) -> None:
+        self.part = SessionPart.HOMEWORK
+        self.wait_and_proceed(lambda: self.enter_survey(), seconds=40)
+    
+    def enter_survey(self) -> None:
+        self.part = SessionPart.SURVEY
+        self.wait_and_proceed(lambda: self.finish(), seconds=10)
+    
+    def finish(self) -> None:
+        self.part = SessionPart.FINISHED
+
+    def wait_and_proceed(self, set_next_state: Callable, minutes: Optional[int] = None, seconds: Optional[int] = None):
+        if minutes is None and seconds is None:
+            raise ValueError('You must pass at least one time unit to the wait_for() function')
+
+        total = 0
+        if minutes is not None:
+            total += 60* minutes
+        if seconds is not None:
+            total += seconds
+
+        self.timer = Timer(total, set_next_state)
+        self.timer.start_time = time.time()
+        self.timer.start()
+
+    def get_remaining_time(self):
+        # Shared variable. Not gonna use a lock, because it is read-only
+        if self.timer is not None:
+            remaining_time = self.timer.interval - int(time.time() - self.timer.start_time)
+            if remaining_time >= 0:
+                return remaining_time
+        return 0
+
+    def __repr__(self) -> str:
+        return '\n'.join([
+            'Session',
+            f'Current part: {self.part}',
+            f'Remaining time: {self.get_remaining_time()}'
+        ])
