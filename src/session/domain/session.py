@@ -2,11 +2,16 @@ from typing import Optional, Callable
 
 import time
 from threading import Timer
+from pydantic import BaseModel
 
 from session.domain.session_part import SessionPart
 
-class Session:
-    def __init__(self) -> None:
+class Session():
+    def __init__(self, seq_number: int, read_comp_link: str, survey_link: str) -> None:
+        self.seq_number = seq_number
+        self.read_comp_link = read_comp_link
+        self.survey_link = survey_link
+
         self.part: SessionPart = SessionPart.WAITING_START
         self.timer = None
 
@@ -46,6 +51,13 @@ class Session:
             if remaining_time >= 0:
                 return remaining_time
         return 0
+
+    def json(self):
+        return {
+            'seq_number': self.seq_number,
+            'read_comp_link': self.read_comp_link,
+            'survey_link': self.survey_link
+        }
 
     def __repr__(self) -> str:
         return '\n'.join([
