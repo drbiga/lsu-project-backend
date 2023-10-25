@@ -1,0 +1,18 @@
+version: '3'
+services:
+  session:
+    build: .
+    container_name: session-service
+    volumes:
+      - session-service:/app/data
+    ports:
+      - 8000:8000
+
+  test_environment_initializer:
+    build: ./environment
+    container_name: initializer
+    depends_on:
+      - session
+
+volumes:
+  session-service:
