@@ -5,6 +5,10 @@ import uvicorn
 
 from session.infra.session_api import session_router
 from student.infra.students_api import students_router
+
+from session.timer.infra.cli_timer import CLITimer
+from session.timer.domain.timer_subject import TimerSubject
+
 # from student.infra.shelve_students_repository import ShelveStudentsRepository
 # from student.domain.student import Student
 
@@ -16,6 +20,11 @@ def main():
     # s2 = repo.load('Matheus')
 
     # print(repo.get_all_student_names())
+
+    # timer = TimerSubject(0, 10)
+    # observer = CLITimer()
+    # timer.attach(observer)
+    # timer.start()
 
     app = FastAPI()
     app.add_middleware(CORSMiddleware, allow_methods=['*'], allow_origins=['*'])

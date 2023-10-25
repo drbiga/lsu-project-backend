@@ -1,13 +1,10 @@
 from fastapi import APIRouter
 
-from session.domain.session import Session
-from session.domain.session_service import SessionService
-from session.infra.shelve_sessions_repository import ShelveSessionsRepository
+from session.infra.instances import session_service
+from session.timer.infra.websocket_timer import timer_websocket_router
 
 session_router = APIRouter(prefix='/sessions')
-
-sessions_repository = ShelveSessionsRepository()
-session_service = SessionService(sessions_repository)
+session_router.include_router(timer_websocket_router)
 
 @session_router.post('')
 def create_session(seq_number: int, read_comp_link: str, survey_link: str):
@@ -53,15 +50,14 @@ def get_current_part():
 
 @session_router.get('/remaining_time')
 def get_remaining_time():
-    global session
-
-    if session is None:
+    try:
+        remaining_time = session_service.get_current_session_remaining_time_seconds()
+        return {
+            'status': 'success',
+            'data': remaining_time
+        }
+    except AttributeError:
         return {
             'status': 'err',
-            'message': 'Session not created yet'
+            'message': 'Session not started yet'
         }
-
-    return {
-        'status': 'success',
-        'data': session.get_remaining_time()
-    }

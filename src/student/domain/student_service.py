@@ -15,7 +15,9 @@ class StudentService:
 
     def start_next_session(self, session_service: SessionService, student_name: str) -> None:
         student = self.repository.load(student_name)
-        session_service.start_session(student.num_finished_sessions)
+        session_service.start_session(student.num_finished_sessions+1)
+        student.finish_one_more_session()
+        self.repository.save(student)
 
     def get_students_names(self) -> List[str]:
         return self.repository.get_all_student_names()
