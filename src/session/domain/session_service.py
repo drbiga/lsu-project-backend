@@ -2,7 +2,7 @@ from threading import Thread
 
 from session.domain.session import Session
 from session.domain.sessions_repository import SessionsRepository
-from session.domain.session_part import SessionPart
+from session.domain.session_part import SessionPart, SessionPartObserver
 from session.timer.domain.timer_observer import TimerObserver
 
 class SessionService:
@@ -22,16 +22,14 @@ class SessionService:
 
     def start_session(self, seq_number: int) -> None:
         if self.executing_session is not None:
-            raise RuntimeError('Only one session is allowed to run each time')
+            if self.executing_session.part.part != SessionPart.FINISHED:
+                raise RuntimeError('Only one session is allowed to run each time')
         
         self.executing_session = self.repository.load(seq_number)
         Thread(target=lambda: self.executing_session.start()).start()
 
-    def get_current_session_part(self) -> SessionPart:
-        return self.executing_session.part
-
-    def get_current_session_remaining_time_seconds(self) -> float:
-        return self.executing_session.get_remaining_time()
-
     def attach_timer_observer(self, observer: TimerObserver) -> None:
         self.executing_session.timer.attach(observer)
+
+    def attach_session_part_observer(self, observer: SessionPartObserver) -> None:
+        self.executing_session.part.attach(observer)

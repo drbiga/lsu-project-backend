@@ -12,9 +12,6 @@ async def attach_timer_observer(websocket: WebSocket):
     await websocket.accept()
     observer = WebSocketTimerObserver(websocket)
     session_service.attach_timer_observer(observer)
-    # subject = TimerSubject(0, 10)
-    # subject.attach(observer)
-    # subject.start()
     try:
         while True:
             await websocket.receive_text()
