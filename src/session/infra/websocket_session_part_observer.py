@@ -3,6 +3,7 @@ from fastapi import APIRouter, WebSocket
 
 from session.domain.session_part import SessionPart, SessionPartObserver
 from session.infra.instances import session_service
+from async_lock import async_lock
 
 session_part_router = APIRouter(prefix='/session_part')
 
@@ -22,6 +23,8 @@ class WebSocketSessionPartObserver(SessionPartObserver):
         self.websocket = websocket
 
     def update(self, new_session_part: SessionPart) -> None:
-        asyncio.run(self.websocket.send_json({
-            'session_part': new_session_part.value
-        }))
+        with async_lock:
+            print('session-part')
+            asyncio.run(self.websocket.send_json({
+                'session_part': new_session_part.value
+            }))

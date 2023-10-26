@@ -45,3 +45,18 @@ def start_next_session(student_name: str):
             'status': 'err',
             'message': 'Session does not exist yet'
         }
+
+@students_router.get('/{student_name}/next_session_seq_number')
+def get_next_session_seq_number(student_name: str):
+    try:
+        next_seq_number = student_service.get_next_session_seq_number(student_name)
+        return {
+            'status': 'success',
+            'data': next_seq_number
+        }
+    except AttributeError:
+        return {
+            'status': 'err',
+            'message': 'Student dest not exist'
+        }
+

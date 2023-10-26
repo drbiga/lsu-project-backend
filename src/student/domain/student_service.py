@@ -21,3 +21,7 @@ class StudentService:
 
     def get_students_names(self) -> List[str]:
         return self.repository.get_all_student_names()
+
+    def get_next_session_seq_number(self, student_name: str) -> int:
+        student = self.repository.load(student_name)
+        return student.num_finished_sessions + 1

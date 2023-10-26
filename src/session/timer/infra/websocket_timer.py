@@ -4,6 +4,7 @@ from fastapi import APIRouter, WebSocket
 from session.timer.domain.timer_observer import TimerObserver
 # from session.timer.domain.timer_subject import TimerSubject
 from session.infra.instances import session_service
+from async_lock import async_lock
 
 timer_websocket_router = APIRouter(prefix='/timer')
 
@@ -23,7 +24,9 @@ class WebSocketTimerObserver(TimerObserver):
         self.websocket = websocket
 
     def update(self, new_time_minutes: int, new_time_seconds: int) -> None:
-        asyncio.run(self.websocket.send_json({
-            'minutes': new_time_minutes,
-            'seconds': new_time_seconds
-        }))
+        with async_lock:
+            print('timer')
+            asyncio.run(self.websocket.send_json({
+                'minutes': new_time_minutes,
+                'seconds': new_time_seconds
+            }))

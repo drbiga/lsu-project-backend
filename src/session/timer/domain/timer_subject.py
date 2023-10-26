@@ -1,8 +1,6 @@
 import time
 from typing import List
 
-from threading import Thread
-
 from session.timer.domain.timer_observer import TimerObserver
 
 
