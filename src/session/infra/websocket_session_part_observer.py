@@ -1,5 +1,6 @@
 import asyncio
 from fastapi import APIRouter, WebSocket
+from concurrent.futures import ThreadPoolExecutor
 
 from session.domain.session_part import SessionPart, SessionPartObserver
 from session.infra.instances import session_service
@@ -24,7 +25,9 @@ class WebSocketSessionPartObserver(SessionPartObserver):
 
     def update(self, new_session_part: SessionPart) -> None:
         with async_lock:
-            print('session-part')
-            asyncio.run(self.websocket.send_json({
-                'session_part': new_session_part.value
-            }))
+            with ThreadPoolExecutor(max_workers=2) as executor:
+                executor.submit(
+                    lambda: asyncio.run(self.websocket.send_json({
+                        'session_part': new_session_part.value
+                    }))
+                )

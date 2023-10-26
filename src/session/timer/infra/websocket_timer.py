@@ -1,5 +1,6 @@
 import asyncio
 from fastapi import APIRouter, WebSocket
+from concurrent.futures import ThreadPoolExecutor
 
 from session.timer.domain.timer_observer import TimerObserver
 # from session.timer.domain.timer_subject import TimerSubject
@@ -25,8 +26,10 @@ class WebSocketTimerObserver(TimerObserver):
 
     def update(self, new_time_minutes: int, new_time_seconds: int) -> None:
         with async_lock:
-            print('timer')
-            asyncio.run(self.websocket.send_json({
-                'minutes': new_time_minutes,
-                'seconds': new_time_seconds
-            }))
+            with ThreadPoolExecutor(max_workers=2) as executor:
+                executor.submit(lambda:
+                    asyncio.run(self.websocket.send_json({
+                        'minutes': new_time_minutes,
+                        'seconds': new_time_seconds
+                    }))
+                )
