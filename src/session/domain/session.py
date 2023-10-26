@@ -21,6 +21,9 @@ class Session:
         # Wait until both part and timer observers have connected
         while len(self.part.observers) == 0 or len(self.timer.observers) == 0:
             ...
+        # Wait just a little longer just to be sure that session part observer
+        # is up and running on the client side
+        time.sleep(1)
         self.part.set_part(SessionPart.READ_COMP)
         self.timer.start(0, 10)
         self.enter_homework()
