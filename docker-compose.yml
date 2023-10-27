@@ -13,6 +13,8 @@ services:
     container_name: initializer
     depends_on:
       - session
+    environment:
+      - HOSTNAME=session
 
 volumes:
   session-service:

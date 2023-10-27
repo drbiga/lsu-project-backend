@@ -1,6 +1,8 @@
 import requests
-
+import os
 import time
+
+hostname = os.getenv('HOSTNAME')
 
 def create_session(seq_number: int):
     read_comps = [
@@ -15,7 +17,7 @@ def create_session(seq_number: int):
         'https://rutgers.ca1.qualtrics.com/jfe/form/SV_6zHK9scZObcdPU2',
         'https://rutgers.ca1.qualtrics.com/jfe/form/SV_9mNoIFNwZSQuscK',
     ]
-    url = 'http://session:8000/sessions'
+    url = f'http://{hostname}:8000/sessions'
     params = {
         'seq_number': seq_number,
         'read_comp_link': read_comps[seq_number-1],
@@ -25,7 +27,7 @@ def create_session(seq_number: int):
 
 
 def create_student(name: str):
-    url = 'http://session:8000/students'
+    url = f'http://{hostname}:8000/students'
     params = {
         'student_name': name
     }
