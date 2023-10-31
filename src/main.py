@@ -5,6 +5,7 @@ import uvicorn
 
 from session.infra.session_api import session_router
 from student.infra.students_api import students_router
+from attention.infra.attention_api import attention_router
 
 from session.timer.infra.cli_timer import CLITimer
 from session.timer.domain.timer_subject import TimerSubject
@@ -28,8 +29,9 @@ def main():
 
     app = FastAPI()
     app.add_middleware(CORSMiddleware, allow_methods=['*'], allow_origins=['*'])
-    app.include_router(session_router)
-    app.include_router(students_router)
+    app.include_router(session_router, tags=['sessions'])
+    app.include_router(students_router, tags=['students'])
+    app.include_router(attention_router, tags=['attention'])
     uvicorn.run(app, host='0.0.0.0')
 
 

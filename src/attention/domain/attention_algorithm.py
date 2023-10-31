@@ -6,6 +6,7 @@ from typing import List
 
 # Time
 from datetime import datetime, timedelta
+import pytz
 
 from statistics import mean, stdev
 
@@ -26,6 +27,8 @@ class FourThresholdsAlgorithm(AttentionAlgorithm):
 
     def filter_last_minute(self, attentions: List[Attention]) -> List[Attention]:
         now = datetime.now()
+        utc = pytz.UTC
+        now = utc.localize(now)
         subset = [
             attention
             for attention in attentions
