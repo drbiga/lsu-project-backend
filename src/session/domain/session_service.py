@@ -33,3 +33,9 @@ class SessionService:
 
     def attach_session_part_observer(self, observer: SessionPartObserver) -> None:
         self.executing_session.part.attach(observer)
+
+    def get_timer_value(self) -> int:
+        return self.executing_session.timer.total
+
+    def get_session_part(self) -> str:
+        return self.executing_session.part.part.value

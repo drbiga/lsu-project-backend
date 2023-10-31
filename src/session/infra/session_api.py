@@ -34,3 +34,31 @@ def start_session(seq_number: int):
 @session_router.get('')
 def get_session(seq_number: int):
     return session_service.get_session(seq_number)
+
+@session_router.get('/timer_value')
+def get_timer_value():
+    try:
+        timer_value = session_service.get_timer_value()
+        return {
+            'status': 'success',
+            'data': timer_value
+        }
+    except AttributeError:
+        return {
+            'status': 'err',
+            'message': 'Session does not exist yet'
+        }
+
+@session_router.get('/session_part')
+def get_session_part():
+    try:
+        part = session_service.get_session_part()
+        return {
+            'status': 'success',
+            'data': part
+        }
+    except AttributeError:
+        return {
+            'status': 'err',
+            'message': 'Session does not exist yet'
+        }
