@@ -1,4 +1,8 @@
 import time
+import random
+
+from threading import Thread
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
@@ -13,6 +17,12 @@ from session.timer.domain.timer_subject import TimerSubject
 # from student.infra.shelve_students_repository import ShelveStudentsRepository
 # from student.domain.student import Student
 
+def write_test_feedback_file():
+    while True:
+        time.sleep(1)
+        with open('feedback.txt', 'w') as out:
+            out.write(str(random.randint(1, 3)))
+
 def main():
     # repo = ShelveStudentsRepository()
 
@@ -26,6 +36,9 @@ def main():
     # observer = CLITimer()
     # timer.attach(observer)
     # timer.start()
+
+    t = Thread(target=write_test_feedback_file)
+    t.start()
 
     app = FastAPI()
     app.add_middleware(CORSMiddleware, allow_methods=['*'], allow_origins=['*'])

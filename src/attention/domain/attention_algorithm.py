@@ -14,14 +14,19 @@ from attention.domain.attention import Attention
 
 
 class AttentionAlgorithm(ABC):
+    # @abstractmethod
+    # def compute(self, attentions: List[Attention]) -> float:
+    #     ...
     @abstractmethod
-    def compute(self, attentions: List[Attention]) -> float:
+    def compute(self) -> float:
         ...
 
+class FourThresholdsAlgorithm(AttentionAlgorithm, DeprecationWarning):
+    def __init__(self, attentions: List[Attention]) -> None:
+        self.attentions = attentions
 
-class FourThresholdsAlgorithm(AttentionAlgorithm):
-    def compute(self, attentions: List[Attention]) -> float:
-        subset = self.filter_last_minute(attentions)
+    def compute(self) -> float:
+        subset = self.filter_last_minute(self.attentions)
         input_levels = self.compute_input_levels_from_attentions(subset)
         return self.compute_threshold_from_input_levels(input_levels)
 

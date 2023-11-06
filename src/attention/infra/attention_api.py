@@ -16,4 +16,5 @@ def get_attentions():
 
 @attention_router.get('/feedback')
 def compute_attention_feedback():
-    return attention_service.get_attention_feedback(FourThresholdsAlgorithm())
+    four_thresh_algo = FourThresholdsAlgorithm(attention_service.attentions)
+    return attention_service.get_attention_feedback(four_thresh_algo)
