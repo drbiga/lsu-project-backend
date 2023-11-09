@@ -8,10 +8,11 @@ from session.domain.session_part import SessionPart, SessionPartSubject
 from session.timer.domain.timer_subject import TimerSubject
 
 class Session:
-    def __init__(self, seq_number: int, read_comp_link: str, survey_link: str) -> None:
+    def __init__(self, seq_number: int, read_comp_link: str, survey_link: str, is_passthrough: bool) -> None:
         self.seq_number = seq_number
         self.read_comp_link = read_comp_link
         self.survey_link = survey_link
+        self.is_passthrough = is_passthrough
 
         self.part: SessionPartSubject = SessionPartSubject()
         self.part.set_part(SessionPart.WAITING_START)
@@ -45,7 +46,8 @@ class Session:
         return {
             'seq_number': self.seq_number,
             'read_comp_link': self.read_comp_link,
-            'survey_link': self.survey_link
+            'survey_link': self.survey_link,
+            'is_passthrough': self.is_passthrough
         }
 
     def __repr__(self) -> str:

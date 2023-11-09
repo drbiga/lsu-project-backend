@@ -21,7 +21,8 @@ def create_session(seq_number: int):
     params = {
         'seq_number': seq_number,
         'read_comp_link': read_comps[seq_number-1],
-        'survey_link': 'https://rutgers.ca1.qualtrics.com/jfe/form/SV_8qfsFsMniPKpIsC' if seq_number in [4, 9] else 'https://rutgers.ca1.qualtrics.com/jfe/form/SV_7OmbPs4NypRC0qa'
+        'survey_link': 'https://rutgers.ca1.qualtrics.com/jfe/form/SV_8qfsFsMniPKpIsC' if seq_number in [4, 9] else 'https://rutgers.ca1.qualtrics.com/jfe/form/SV_7OmbPs4NypRC0qa',
+        'is_passthrough': True
     }
     requests.post(url, params=params)
 

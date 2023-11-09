@@ -1,3 +1,4 @@
+from pydantic import BaseModel
 from fastapi import APIRouter
 
 from session.infra.instances import session_service
@@ -8,8 +9,14 @@ session_router = APIRouter(prefix='/sessions')
 session_router.include_router(timer_websocket_router)
 session_router.include_router(session_part_router)
 
+class CreateSessionRequest(BaseModel):
+    seq_number: int
+    read_comp_link: str
+    survey_link: str
+    is_passthrough: bool
+
 @session_router.post('')
-def create_session(seq_number: int, read_comp_link: str, survey_link: str):
+def create_session(seq_number: int, read_comp_link: str, survey_link: str, is_passthrough: bool):
     session_service.create_session(seq_number, read_comp_link, survey_link)
     return {
         'status': 'success',
@@ -61,4 +68,17 @@ def get_session_part():
         return {
             'status': 'err',
             'message': 'Session does not exist yet'
+        }
+
+
+@session_router.get('/{session_seq_number}/is_passthrough')
+def check_session_is_passthrough(session_seq_number: int) -> bool:
+    try:
+        return {
+            'status': 'ok',
+            'is_passthrough': session_service.get_session(session_seq_number).is_passthrough
+        }
+    except:
+        return {
+            'status': 'err',
         }

@@ -21,6 +21,7 @@ MACRO_FEEDBACK_TIME_MULTIPLE = 3
 class StudentService:
     def __init__(self, repository: StudentsRepository) -> None:
         self.repository = repository
+        self.current_student = None
 
     def create_student(self, student_name: str) -> Student:
         student = Student(name=student_name)
@@ -83,3 +84,26 @@ class StudentService:
 
     def get_student(self, student_name: str) -> Student:
         return self.repository.load(student_name)
+
+    def get_micro_feedback(self, seq_num: int) -> float:
+        """Micro feedbacks are calculated using the sequence number.
+        The sequence number itself represents the macro feedback for the whole period.
+        The index of the microfeedbacks should calculated based on that.
+        
+        For now, to simplify the code, I'm just going to return the first microfeedback
+        for the period.
+        """
+        return self.current_student.session_executions[-1].micro_feedbacks[MACRO_FEEDBACK_TIME_MULTIPLE*seq_num]
+
+    def get_macro_feedback(self, seq_num: int) -> float:
+        return self.current_student.session_executions[-1].macro_feedbacks[seq_num-1]
+
+    def get_attention_feedback(self, seq_num: int) -> float:
+        if len(self.current_student.session_executions[-1].macro_feedbacks) < seq_num:
+            return self.get_micro_feedback(seq_num)
+        else:
+            return self.get_macro_feedback(seq_num)
+
+
+    def get_current_student(self) -> Student:
+        return self.current_student

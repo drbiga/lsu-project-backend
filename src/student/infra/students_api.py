@@ -69,3 +69,17 @@ def get_next_session_seq_number(student_name: str):
 @students_router.get('/current/session_executions/last')
 def get_last_session_executions() -> dict:
     return student_service.current_student.session_executions[-1].model_dump()
+
+
+@students_router.get('/current/attention_feedback')
+def get_attention_feedback(seq_num: int) -> float:
+    return student_service.get_attention_feedback(seq_num)
+
+
+@students_router.get('/current/data')
+def get_current_student():
+    s = student_service.get_current_student()
+    return {
+        'status': 'ok' if s is not None else 'err',
+        'student': None if s is None else s.model_dump()
+    }
