@@ -17,7 +17,7 @@ class CreateSessionRequest(BaseModel):
 
 @session_router.post('')
 def create_session(seq_number: int, read_comp_link: str, survey_link: str, is_passthrough: bool):
-    session_service.create_session(seq_number, read_comp_link, survey_link)
+    session_service.create_session(seq_number, read_comp_link, survey_link, is_passthrough)
     return {
         'status': 'success',
         'message': 'Session created successfully'
@@ -72,7 +72,7 @@ def get_session_part():
 
 
 @session_router.get('/{session_seq_number}/is_passthrough')
-def check_session_is_passthrough(session_seq_number: int) -> bool:
+def check_session_is_passthrough(session_seq_number: int) -> dict:
     try:
         return {
             'status': 'ok',
@@ -81,4 +81,5 @@ def check_session_is_passthrough(session_seq_number: int) -> bool:
     except:
         return {
             'status': 'err',
+            'is_passthrough': False
         }

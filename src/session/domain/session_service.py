@@ -10,8 +10,8 @@ class SessionService:
         self.repository = repository
         self.executing_session = None
 
-    def create_session(self, seq_number: int, read_comp_link: str, survey_link: str) -> None:
-        session = Session(seq_number=seq_number, read_comp_link=read_comp_link, survey_link=survey_link)
+    def create_session(self, seq_number: int, read_comp_link: str, survey_link: str, is_passthrough: bool) -> None:
+        session = Session(seq_number=seq_number, read_comp_link=read_comp_link, survey_link=survey_link, is_passthrough=is_passthrough)
         self.repository.save(session)
 
     # def get_all_sessions(self, )
