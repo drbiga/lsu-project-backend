@@ -37,8 +37,8 @@ def main():
     # timer.attach(observer)
     # timer.start()
 
-    t = Thread(target=write_test_feedback_file)
-    t.start()
+    # t = Thread(target=write_test_feedback_file)
+    # t.start()
 
     app = FastAPI()
     app.add_middleware(CORSMiddleware, allow_methods=['*'], allow_origins=['*'])
