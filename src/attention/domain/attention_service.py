@@ -9,4 +9,5 @@ class AttentionService:
         self.attentions.append(attention)
 
     def get_attention_feedback(self, attention_algorithm: AttentionAlgorithm) -> float:
-        return attention_algorithm.compute()
+        feedback = attention_algorithm.compute()
+        return feedback

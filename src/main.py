@@ -17,11 +17,11 @@ from session.timer.domain.timer_subject import TimerSubject
 # from student.infra.shelve_students_repository import ShelveStudentsRepository
 # from student.domain.student import Student
 
-def write_test_feedback_file():
-    while True:
-        time.sleep(1)
-        with open('feedback.txt', 'w') as out:
-            out.write(str(random.randint(1, 3)))
+# def write_test_feedback_file():
+#     while True:
+#         time.sleep(1)
+#         with open('feedback.txt', 'w') as out:
+#             out.write(str(random.randint(1, 3)))
 
 def main():
     # repo = ShelveStudentsRepository()

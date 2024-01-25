@@ -15,8 +15,10 @@ from session.domain.session_part import SessionPart
 from attention.domain.attention_service import AttentionService
 from attention.domain.attention_algorithm import AttentionAlgorithm
 
-MICRO_FEEDBACK_TIME = 1
+MICRO_FEEDBACK_TIME = 10
 MACRO_FEEDBACK_TIME_MULTIPLE = 3
+
+TOTAL_FEEDBACKS = 20
 
 class StudentService:
     def __init__(self, repository: StudentsRepository) -> None:
@@ -36,7 +38,8 @@ class StudentService:
     ) -> None:
         self.current_student = self.repository.load(student_name)
         self.current_student.start_new_session()
-        session_service.start_session(len(self.current_student.session_executions)+1)
+        print("Starting session", len(self.current_student.session_executions))
+        session_service.start_session(len(self.current_student.session_executions))
         self.repository.save(self.current_student)
         self.feedback_monitoring_thread = Thread(
             target=lambda: self.__start_recording_feedbacks(attention_service, session_service, algo)
@@ -67,6 +70,7 @@ class StudentService:
         while not session.part.part == SessionPart.FINISHED:
             time.sleep(MICRO_FEEDBACK_TIME)
             feedback = attention_service.get_attention_feedback(attention_algo)
+            feedback = int(feedback)
 
             # Registering microfeedback for grouping in macro feedback
             micro_feedbacks.append(feedback)
@@ -74,7 +78,7 @@ class StudentService:
             micro_sleeps_counter += 1
             if micro_sleeps_counter == MACRO_FEEDBACK_TIME_MULTIPLE:
                 micro_sleeps_counter = 0
-                macro_feedback = round(statistics.mean(micro_feedbacks), 0)
+                macro_feedback = int(round(statistics.mean(micro_feedbacks), 0))
                 micro_feedbacks.clear()
                 self.current_student.record_macro_feedback(macro_feedback)
         
@@ -96,13 +100,25 @@ class StudentService:
         return self.current_student.session_executions[-1].micro_feedbacks[MACRO_FEEDBACK_TIME_MULTIPLE*seq_num]
 
     def get_macro_feedback(self, seq_num: int) -> float:
-        return self.current_student.session_executions[-1].macro_feedbacks[seq_num-1]
+        return self.current_student.session_executions[-1].macro_feedbacks[seq_num]
 
-    def get_attention_feedback(self, seq_num: int) -> float:
-        if len(self.current_student.session_executions[-1].macro_feedbacks) < seq_num:
-            return self.get_micro_feedback(seq_num)
-        else:
-            return self.get_macro_feedback(seq_num)
+    def get_attention_feedbacks(self) -> List[int]:
+        feedbacks = []
+        for i in range(TOTAL_FEEDBACKS):
+            # Behaviour that we want:
+            # When we have the "macro" feedback for some period, use the macro feedback
+            # If we don't have the macro feedback for some specific period, then
+            #   If we have any micro feedback, use it
+            #   Else, use the error code (-1)
+            if i < len(self.current_student.session_executions[-1].macro_feedbacks):
+                feedbacks.append(self.get_macro_feedback(i))
+            else:
+                len_micro_feedbacks = len(self.current_student.session_executions[-1].micro_feedbacks)
+                if MACRO_FEEDBACK_TIME_MULTIPLE*i < len_micro_feedbacks:
+                    feedbacks.append(self.get_micro_feedback(i))
+                else:
+                    feedbacks.append(-1)
+        return feedbacks
 
 
     def get_current_student(self) -> Student:

@@ -26,17 +26,17 @@ class Session:
         # is up and running on the client side
         time.sleep(1)
         self.part.set_part(SessionPart.READ_COMP)
-        self.timer.start(0, 10)
+        self.timer.start(0, 5)
         self.enter_homework()
 
     def enter_homework(self) -> None:
         self.part.set_part(SessionPart.HOMEWORK)
-        self.timer.start(0, 40)
+        self.timer.start(0, 5)
         self.enter_survey()
     
     def enter_survey(self) -> None:
         self.part.set_part(SessionPart.SURVEY)
-        self.timer.start(0, 10)
+        self.timer.start(0, 5)
         self.finish()
 
     def finish(self) -> None:

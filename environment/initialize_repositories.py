@@ -3,6 +3,8 @@ import os
 import time
 
 hostname = os.getenv('HOSTNAME')
+if hostname is None:
+    hostname = '127.0.0.1'
 
 def create_session(seq_number: int):
     read_comps = [
@@ -22,7 +24,7 @@ def create_session(seq_number: int):
         'seq_number': seq_number,
         'read_comp_link': read_comps[seq_number-1],
         'survey_link': 'https://rutgers.ca1.qualtrics.com/jfe/form/SV_8qfsFsMniPKpIsC' if seq_number in [4, 9] else 'https://rutgers.ca1.qualtrics.com/jfe/form/SV_7OmbPs4NypRC0qa',
-        'is_passthrough': seq_number % 2 == 1
+        'is_passthrough': seq_number % 2 == 0
     }
     requests.post(url, params=params)
 

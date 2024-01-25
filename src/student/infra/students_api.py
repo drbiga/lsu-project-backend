@@ -71,9 +71,19 @@ def get_last_session_executions() -> dict:
     return student_service.current_student.session_executions[-1].model_dump()
 
 
-@students_router.get('/current/attention_feedback')
-def get_attention_feedback(seq_num: int) -> float:
-    return student_service.get_attention_feedback(seq_num)
+@students_router.get('/current/attention_feedbacks')
+def get_attention_feedbacks() -> dict:
+    try:
+        return {
+            'status': 'ok',
+            'feedbacks': student_service.get_attention_feedbacks()
+        }
+    except Exception as e:
+        print(e)
+        return {
+            'status': 'err',
+            'feedback': 0
+        }
 
 
 @students_router.get('/current/data')
