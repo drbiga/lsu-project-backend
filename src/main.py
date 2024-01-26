@@ -45,7 +45,7 @@ def main():
     app.include_router(session_router, tags=['sessions'])
     app.include_router(students_router, tags=['students'])
     app.include_router(attention_router, tags=['attention'])
-    uvicorn.run(app, host='0.0.0.0')
+    uvicorn.run(app, host='0.0.0.0', port=8000)
 
 
 if __name__ == '__main__':
