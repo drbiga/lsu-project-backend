@@ -1,6 +1,7 @@
 from threading import Thread
 
 from session.domain.session import Session
+from session.domain.session_observer import SessionObserver
 from session.domain.sessions_repository import SessionsRepository
 from session.domain.session_part import SessionPart, SessionPartObserver
 from session.timer.domain.timer_observer import TimerObserver
@@ -33,6 +34,9 @@ class SessionService:
 
     def attach_session_part_observer(self, observer: SessionPartObserver) -> None:
         self.executing_session.part.attach(observer)
+
+    def attach_session_observer(self, observer: SessionObserver) -> None:
+        self.executing_session.attach(observer)
 
     def get_timer_value(self) -> int:
         return self.executing_session.timer.total

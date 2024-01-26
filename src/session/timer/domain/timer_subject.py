@@ -7,9 +7,11 @@ from session.timer.domain.timer_observer import TimerObserver
 class TimerSubject:
     def __init__(self) -> None:
         self.observers: List[TimerObserver] = []
-
-    def start(self, minutes: int, seconds: int) -> None:
+    
+    def set_time(self, minutes: int, seconds: int) -> None:
         self.total = 60*minutes + seconds
+
+    def start(self) -> None:
         while self.total > 0:
             time.sleep(1)
             self.total -= 1

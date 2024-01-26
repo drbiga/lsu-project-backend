@@ -1,9 +1,10 @@
 from pydantic import BaseModel
-from fastapi import APIRouter
+from fastapi import APIRouter, WebSocket
 
 from session.infra.instances import session_service
 from session.timer.infra.websocket_timer import timer_websocket_router
 from session.infra.websocket_session_part_observer import session_part_router
+from session.infra.websocket_session_observer import WebSocketSessionObserver
 
 session_router = APIRouter(prefix='/sessions')
 session_router.include_router(timer_websocket_router)
@@ -83,3 +84,15 @@ def check_session_is_passthrough(session_seq_number: int) -> dict:
             'status': 'err',
             'is_passthrough': False
         }
+
+@session_router.websocket('/ws')
+async def attach_timer_observer(websocket: WebSocket):
+    await websocket.accept()
+    observer = WebSocketSessionObserver(websocket)
+    session_service.attach_session_observer(observer)
+    try:
+        while True:
+            await websocket.receive_text()
+    except Exception:
+        print('Error in websocket connection')
+
