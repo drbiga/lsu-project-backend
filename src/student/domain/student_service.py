@@ -15,8 +15,8 @@ from session.domain.session_part import SessionPart
 from attention.domain.attention_service import AttentionService
 from attention.domain.attention_algorithm import AttentionAlgorithm
 
-MICRO_FEEDBACK_TIME = 10
-MACRO_FEEDBACK_TIME_MULTIPLE = 3
+MICRO_FEEDBACK_TIME = 60 # one micro feedback every minute
+MACRO_FEEDBACK_TIME_MULTIPLE = 3 # one macro feedback every three minutes
 
 TOTAL_FEEDBACKS = 20
 
@@ -65,7 +65,7 @@ class StudentService:
         micro_feedbacks = []
 
         while session.part.part == SessionPart.WAITING_START:
-            ... # wait
+            time.sleep(0.5)
 
         while not session.part.part == SessionPart.FINISHED:
             time.sleep(MICRO_FEEDBACK_TIME)
