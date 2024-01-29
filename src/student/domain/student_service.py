@@ -64,10 +64,10 @@ class StudentService:
         micro_sleeps_counter = 0
         micro_feedbacks = []
 
-        while session.part.part == SessionPart.WAITING_START:
+        while session.session_part == SessionPart.WAITING_START:
             time.sleep(0.5)
 
-        while not session.part.part == SessionPart.FINISHED:
+        while not session.session_part == SessionPart.FINISHED:
             time.sleep(MICRO_FEEDBACK_TIME)
             feedback = attention_service.get_attention_feedback(attention_algo)
             feedback = int(feedback)

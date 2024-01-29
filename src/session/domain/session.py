@@ -2,11 +2,14 @@ import time
 
 from typing import List
 
-from session.domain.session_part import SessionPart, SessionPartSubject
-from session.timer.domain.timer_subject import TimerSubject
+from session.domain.session_part import SessionPart
 from session.domain.session_observer import SessionObserver
 
-class Session:    
+class Session:
+    TIME_SECONDS_READ_COMP = 10 * 60
+    TIME_SECONDS_HOMEWORK = 40 * 60
+    TIME_SECONDS_SURVEY = 10 * 60
+
     def __init__(self, seq_number: int, read_comp_link: str, survey_link: str, is_passthrough: bool) -> None:
         # Subject attributes (observable)
         self.observers: List[SessionObserver] = []
@@ -17,9 +20,8 @@ class Session:
         self.survey_link = survey_link
         self.is_passthrough = is_passthrough
 
-        self.part: SessionPartSubject = SessionPartSubject()
-        self.part.set_part(SessionPart.WAITING_START)
-        self.timer = TimerSubject()
+        self.session_part = SessionPart.WAITING_START.value
+        self.timer = Session.TIME_SECONDS_READ_COMP
 
     # ---------------------------------------------------------------------------------
     # Subject methods
@@ -31,48 +33,45 @@ class Session:
 
     def notify(self) -> None:
         for observer in self.observers:
-            observer.update(self.part.part.value, self.timer.total)
+            observer.update({
+                'session_part': self.session_part,
+                'remaining_time': self.timer
+            })
 
     # ---------------------------------------------------------------------------------
     # Domain methods
-    def start(self) -> None:
-        # Wait until either
-        # - Both part and timer observers have connected
-        # - The session observer has connected
-        part_and_timer_observers = len(self.part.observers) > 0 and len(self.timer.observers) > 0
-        session_observer = len(self.observers) > 0
-        exit_condition = part_and_timer_observers or session_observer
-        while not exit_condition:
-            part_and_timer_observers = len(self.part.observers) > 0 and len(self.timer.observers) > 0
-            session_observer = len(self.observers) > 0
-            exit_condition = part_and_timer_observers or session_observer
+    def run_timer(self) -> None:
+        # At every timer tick, we emit an update to the observersf
+        while self.timer > 0:
+            self.timer -= 1
+            self.notify()
+            time.sleep(1)
 
-        print('Exited the wait while loop')
+    def start(self) -> None:
+        # Wait until observer has attached (web application)
+        while len(self.observers) == 0:
+            time.sleep(1)
+
         # Wait just a little longer just to be sure that session part observer
         # is up and running on the client side
         time.sleep(1)
-        self.part.set_part(SessionPart.READ_COMP)
-        self.timer.set_time(10, 0)
-        self.notify()
-        self.timer.start()
+        self.run_timer()
         self.enter_homework()
 
     def enter_homework(self) -> None:
-        self.part.set_part(SessionPart.HOMEWORK)
-        self.timer.set_time(40, 0)
-        self.notify()
-        self.timer.start()
+        self.session_part = SessionPart.HOMEWORK.value
+        self.timer = Session.TIME_SECONDS_HOMEWORK
+        self.run_timer()
         self.enter_survey()
     
     def enter_survey(self) -> None:
-        self.part.set_part(SessionPart.SURVEY)
-        self.timer.set_time(10, 0)
-        self.notify()
-        self.timer.start()
+        self.session_part = SessionPart.SURVEY.value
+        self.timer = Session.TIME_SECONDS_SURVEY
+        self.run_timer()
         self.finish()
 
     def finish(self) -> None:
-        self.part.set_part(SessionPart.FINISHED)
+        self.session_part = SessionPart.FINISHED.value
         self.notify()
 
     def json(self):
@@ -81,13 +80,13 @@ class Session:
             'read_comp_link': self.read_comp_link,
             'survey_link': self.survey_link,
             'is_passthrough': self.is_passthrough,
-            'session_part': self.part.part.value,
-            'total_time_left': self.timer.total
+            'session_part': self.session_part,
+            'total_time_left': self.timer
         }
 
     def __repr__(self) -> str:
         return '\n'.join([
             'Session',
-            f'Current part: {self.part}',
-            f'Remaining time: {self.get_remaining_time()}'
+            f'Current part: {self.session_part}',
+            f'Remaining time: {self.timer}'
         ])

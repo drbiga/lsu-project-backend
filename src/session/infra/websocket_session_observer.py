@@ -9,12 +9,9 @@ class WebSocketSessionObserver(SessionObserver):
     def __init__(self, websocket: WebSocket) -> None:
         self.websocket = websocket
 
-    def update(self, session_part: str, total_time_left: float) -> None:
+    def update(self, session_data: dict) -> None:
         with async_lock:
             with ThreadPoolExecutor(max_workers=2) as executor:
                 executor.submit(
-                    lambda: asyncio.run(self.websocket.send_json({
-                        'session_part': session_part,
-                        'total_time_left': total_time_left
-                    }))
+                    lambda: asyncio.run(self.websocket.send_json(session_data))
                 )
