@@ -1,13 +1,11 @@
 from pydantic import BaseModel
-from fastapi import APIRouter
+from fastapi import APIRouter, WebSocket, Response, status
 
 from session.infra.instances import session_service
-from session.timer.infra.websocket_timer import timer_websocket_router
-from session.infra.websocket_session_part_observer import session_part_router
+from session.infra.websocket_session_observer import WebSocketSessionObserver
 
 session_router = APIRouter(prefix='/sessions')
-session_router.include_router(timer_websocket_router)
-session_router.include_router(session_part_router)
+
 
 class CreateSessionRequest(BaseModel):
     seq_number: int
@@ -83,3 +81,29 @@ def check_session_is_passthrough(session_seq_number: int) -> dict:
             'status': 'err',
             'is_passthrough': False
         }
+
+@session_router.get('/executing', status_code=status.HTTP_200_OK)
+def get_executing_session(response: Response) -> dict:
+    try:
+        return {
+            'status': 'ok',
+            'session_data': session_service.get_executing_session()
+        }
+    except Exception as e:
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return {
+            'status': 'err',
+            'message': str(e)
+        }
+
+@session_router.websocket('/ws')
+async def attach_session_observer(websocket: WebSocket):
+    await websocket.accept()
+    observer = WebSocketSessionObserver(websocket)
+    session_service.attach_session_observer(observer)
+    try:
+        while True:
+            await websocket.receive_text()
+    except Exception:
+        print('Error in websocket connection')
+
