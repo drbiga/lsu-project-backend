@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from fastapi import APIRouter, WebSocket
+from fastapi import APIRouter, WebSocket, Response, status
 
 from session.infra.instances import session_service
 from session.infra.websocket_session_observer import WebSocketSessionObserver
@@ -80,6 +80,20 @@ def check_session_is_passthrough(session_seq_number: int) -> dict:
         return {
             'status': 'err',
             'is_passthrough': False
+        }
+
+@session_router.get('/executing', status_code=status.HTTP_200_OK)
+def get_executing_session(response: Response) -> dict:
+    try:
+        return {
+            'status': 'ok',
+            'session_data': session_service.get_executing_session()
+        }
+    except Exception as e:
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return {
+            'status': 'err',
+            'message': str(e)
         }
 
 @session_router.websocket('/ws')

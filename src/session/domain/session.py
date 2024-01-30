@@ -55,6 +55,7 @@ class Session:
         # Wait just a little longer just to be sure that session part observer
         # is up and running on the client side
         time.sleep(1)
+        self.session_part = SessionPart.READ_COMP.value
         self.run_timer()
         self.enter_homework()
 
@@ -80,8 +81,12 @@ class Session:
             'read_comp_link': self.read_comp_link,
             'survey_link': self.survey_link,
             'is_passthrough': self.is_passthrough,
+        }
+    
+    def get_data(self) -> dict:
+        return {
             'session_part': self.session_part,
-            'total_time_left': self.timer
+            'remaining_time': self.timer
         }
 
     def __repr__(self) -> str:

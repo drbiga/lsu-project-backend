@@ -35,3 +35,6 @@ class SessionService:
 
     def get_session_part(self) -> str:
         return self.executing_session.session_part
+
+    def get_executing_session(self) -> dict:
+        return self.executing_session.get_data()
