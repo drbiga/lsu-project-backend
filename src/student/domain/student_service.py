@@ -41,10 +41,16 @@ class StudentService:
         print("Starting session", len(self.current_student.session_executions))
         session_service.start_session(len(self.current_student.session_executions))
         self.repository.save(self.current_student)
+
         self.feedback_monitoring_thread = Thread(
             target=lambda: self.__start_recording_feedbacks(attention_service, session_service, algo)
         )
         self.feedback_monitoring_thread.start()
+
+        self.attention_monitoring_thread = Thread(
+            target=lambda: self.__start_recording_second_wise_data(attention_service, session_service)
+        )
+        self.attention_monitoring_thread.start()
 
     def get_students_names(self) -> List[str]:
         return self.repository.get_all_student_names()
@@ -84,6 +90,27 @@ class StudentService:
         
         # After collecting feedback, save the student with all
         # the session execution history
+        self.repository.save(self.current_student)
+
+    def __start_recording_second_wise_data(
+            self,
+            attention_service: AttentionService,
+            session_service: SessionService,
+        ) -> None:
+        # For every second
+        # Get raw values from somewhere
+        # Save values into session execution
+        session = session_service.executing_session
+
+        # Waiting for the user to actually start the session        
+        while session.session_part == SessionPart.WAITING_START:
+            time.sleep(0.5)
+
+        while not session.session_part == SessionPart.FINISHED:
+            time.sleep(1)
+            attention = attention_service.get_current_attention()
+            self.current_student.record_second_wise_data(attention)
+
         self.repository.save(self.current_student)
 
     def get_student(self, student_name: str) -> Student:
