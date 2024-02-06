@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Response, status
 
 from student.domain.student_service import StudentService
 from student.infra.shelve_students_repository import ShelveStudentsRepository
@@ -31,6 +31,21 @@ def create_student(student_name: str):
         return {
             'status': 'err',
             'message': 'Student already exists'
+        }
+
+@students_router.put('', status_code=status.HTTP_200_OK)
+def set_student_survey_queue_link(student_name: str, survey_queue_link: str, response: Response):
+    try:
+        student_service.set_student_survey_queue_link(student_name, survey_queue_link)
+        return {
+            'status': 'success',
+            'message': 'Survey queue link for student was set successfully'
+        }
+    except ValueError:
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return {
+            'status': 'err',
+            'message': 'Something went wrong'
         }
 
 @students_router.post('/{student_name}/start_next_session')

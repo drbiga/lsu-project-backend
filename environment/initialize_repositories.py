@@ -8,14 +8,14 @@ if hostname is None:
 
 def create_session(seq_number: int):
     read_comps = [
-        'https://redcap.rwjms.rutgers.edu/surveys/?s=CMRLCMH947AY9C8D'
+        'https://redcap.rwjms.rutgers.edu/surveys/?s=Y8XAM78DD4883XDA'
         for _ in range(10)
     ]
     url = f'http://{hostname}:8000/sessions'
     params = {
         'seq_number': seq_number,
         'read_comp_link': read_comps[seq_number-1],
-        'survey_link': 'https://redcap.rwjms.rutgers.edu/surveys/?s=CMRLCMH947AY9C8D',
+        'survey_link': 'https://redcap.rwjms.rutgers.edu/surveys/?s=Y8XAM78DD4883XDA',
         'is_passthrough': seq_number % 2 == 0
     }
     requests.post(url, params=params)

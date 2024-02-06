@@ -120,6 +120,10 @@ class StudentService:
                     feedbacks.append(-1)
         return feedbacks
 
-
     def get_current_student(self) -> Student:
         return self.current_student
+
+    def set_student_survey_queue_link(self, student_name: str, survey_queue_link: str) -> None:
+        student = self.repository.load(student_name)
+        student.set_survey_queue_link(survey_queue_link)
+        self.repository.save(student)
