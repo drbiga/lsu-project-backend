@@ -6,6 +6,7 @@ from student.domain.session_execution import SessionExecution, PointData
 class Student(BaseModel):
     name: str
     session_executions: Optional[List[SessionExecution]] = []
+    survey_queue_link: Optional[str] = None
 
 
     def start_new_session(self) -> None:
@@ -23,3 +24,6 @@ class Student(BaseModel):
     def record_second_wise_data(self, point_data: PointData) -> None:
         # Recording is always done to the last executing session
         self.session_executions[-1].record_second_wise_data(point_data)
+
+    def set_survey_queue_link(self, link: str) -> None:
+        self.survey_queue_link = link
