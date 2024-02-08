@@ -96,6 +96,21 @@ def get_executing_session(response: Response) -> dict:
             'message': str(e)
         }
 
+@session_router.post('/executing/resume', status_code=status.HTTP_200_OK)
+def resume_executing_session(response: Response) -> dict:
+    try:
+        session_service.resume_ongoing_session()
+        return {
+            'status': 'success',
+            'message': 'Session resumed'
+        }
+    except Exception as e:
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return {
+            'status': 'err',
+            'message': str(e)
+        }
+
 @session_router.websocket('/ws')
 async def attach_session_observer(websocket: WebSocket):
     await websocket.accept()
