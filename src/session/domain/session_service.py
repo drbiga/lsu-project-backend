@@ -5,6 +5,10 @@ from session.domain.session_observer import SessionObserver
 from session.domain.sessions_repository import SessionsRepository
 from session.domain.session_part import SessionPart
 
+class SessionHasNotStartedError(Exception):
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)
+        self.message = "You have not started the session yet"
 
 class SessionService:
     def __init__(self, repository: SessionsRepository) -> None:
@@ -45,4 +49,6 @@ class SessionService:
         return self.executing_session.session_part
 
     def get_executing_session(self) -> dict:
+        if self.executing_session is None:
+            raise SessionHasNotStartedError()
         return self.executing_session.get_data()
