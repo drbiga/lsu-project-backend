@@ -31,8 +31,9 @@ class SessionService:
         """Resumes the on-going session for the student after he/she has
         pressed the Continue button upon submitting the Read-Comp survey
         """
-        session_worker = Thread(target=lambda: self.executing_session.enter_homework())
-        session_worker.start()
+        if not self.executing_session.has_resumed:
+            session_worker = Thread(target=lambda: self.executing_session.enter_homework())
+            session_worker.start()
 
     def attach_session_observer(self, observer: SessionObserver) -> None:
         self.executing_session.attach(observer)
