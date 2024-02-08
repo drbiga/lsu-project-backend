@@ -6,9 +6,9 @@ from session.domain.session_part import SessionPart
 from session.domain.session_observer import SessionObserver
 
 class Session:
-    TIME_SECONDS_READ_COMP = 10 * 60
-    TIME_SECONDS_HOMEWORK = 40 * 60
-    TIME_SECONDS_SURVEY = 10 * 60
+    TIME_SECONDS_READ_COMP = 10# * 60
+    TIME_SECONDS_HOMEWORK = 40# * 60
+    TIME_SECONDS_SURVEY = 10# * 60
 
     def __init__(self, seq_number: int, read_comp_link: str, survey_link: str, is_passthrough: bool) -> None:
         # Subject attributes (observable)
@@ -19,6 +19,12 @@ class Session:
         self.read_comp_link = read_comp_link
         self.survey_link = survey_link
         self.is_passthrough = is_passthrough
+
+        # State variable to prevent session from being resumed multiple times
+        # regardless of how many times the user press the resume button
+        # Could prevent bugs where they press the button multiple times and have
+        # multiple homework/post-session survey times.
+        self.has_resumed = False
 
         self.session_part = SessionPart.WAITING_START.value
         self.timer = Session.TIME_SECONDS_READ_COMP
@@ -57,9 +63,13 @@ class Session:
         time.sleep(1)
         self.session_part = SessionPart.READ_COMP.value
         self.run_timer()
-        self.enter_homework()
+        # self.enter_homework()
 
     def enter_homework(self) -> None:
+        # Once the session has entered the homework part, it is
+        # considered as resumed, and the user cannot resume it
+        # once again
+        self.has_resumed = True
         self.session_part = SessionPart.HOMEWORK.value
         self.timer = Session.TIME_SECONDS_HOMEWORK
         self.run_timer()
