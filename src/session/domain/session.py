@@ -6,9 +6,9 @@ from session.domain.session_part import SessionPart
 from session.domain.session_observer import SessionObserver
 
 class Session:
-    TIME_SECONDS_READ_COMP = 10# * 60
-    TIME_SECONDS_HOMEWORK = 40# * 60
-    TIME_SECONDS_SURVEY = 10# * 60
+    TIME_SECONDS_READ_COMP = 10 * 60
+    TIME_SECONDS_HOMEWORK = 40 * 60
+    TIME_SECONDS_SURVEY = 10 * 60
 
     def __init__(self, seq_number: int, read_comp_link: str, survey_link: str, is_passthrough: bool) -> None:
         # Subject attributes (observable)
