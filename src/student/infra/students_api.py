@@ -97,7 +97,7 @@ def get_attention_feedbacks() -> dict:
         print(e)
         return {
             'status': 'err',
-            'feedback': 0
+            'feedbacks': []
         }
 
 

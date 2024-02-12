@@ -5,6 +5,10 @@ from session.domain.session_observer import SessionObserver
 from session.domain.sessions_repository import SessionsRepository
 from session.domain.session_part import SessionPart
 
+class SessionHasNotStartedError(Exception):
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)
+        self.message = "You have not started the session yet"
 
 class SessionService:
     def __init__(self, repository: SessionsRepository) -> None:
@@ -27,6 +31,14 @@ class SessionService:
         self.executing_session = self.repository.load(seq_number)
         Thread(target=lambda: self.executing_session.start()).start()
 
+    def resume_ongoing_session(self) -> None:
+        """Resumes the on-going session for the student after he/she has
+        pressed the Continue button upon submitting the Read-Comp survey
+        """
+        if not self.executing_session.has_resumed:
+            session_worker = Thread(target=lambda: self.executing_session.enter_homework())
+            session_worker.start()
+
     def attach_session_observer(self, observer: SessionObserver) -> None:
         self.executing_session.attach(observer)
 
@@ -37,4 +49,6 @@ class SessionService:
         return self.executing_session.session_part
 
     def get_executing_session(self) -> dict:
+        if self.executing_session is None:
+            raise SessionHasNotStartedError()
         return self.executing_session.get_data()

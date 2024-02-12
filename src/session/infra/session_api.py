@@ -1,11 +1,13 @@
 from pydantic import BaseModel
 from fastapi import APIRouter, WebSocket, Response, status
 
+from session.domain.session_service import SessionHasNotStartedError
 from session.infra.instances import session_service
 from session.infra.websocket_session_observer import WebSocketSessionObserver
 
 session_router = APIRouter(prefix='/sessions')
 
+SESSION_NOT_STARTED_ERR_TYPE = 'SESSION_NOT_STARTED'
 
 class CreateSessionRequest(BaseModel):
     seq_number: int
@@ -73,21 +75,43 @@ def get_session_part():
 def check_session_is_passthrough(session_seq_number: int) -> dict:
     try:
         return {
-            'status': 'ok',
+            'status': 'success',
             'is_passthrough': session_service.get_session(session_seq_number).is_passthrough
         }
     except:
         return {
             'status': 'err',
-            'is_passthrough': False
+            'is_passthrough': 0
         }
 
 @session_router.get('/executing', status_code=status.HTTP_200_OK)
 def get_executing_session(response: Response) -> dict:
     try:
         return {
-            'status': 'ok',
+            'status': 'success',
             'session_data': session_service.get_executing_session()
+        }
+    except SessionHasNotStartedError as e:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return {
+            'status': 'err',
+            'err_type': SESSION_NOT_STARTED_ERR_TYPE,
+            'message': e.message
+        }
+    except Exception as e:
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return {
+            'status': 'err',
+            'message': str(e)
+        }
+
+@session_router.post('/executing/resume', status_code=status.HTTP_200_OK)
+def resume_executing_session(response: Response) -> dict:
+    try:
+        session_service.resume_ongoing_session()
+        return {
+            'status': 'success',
+            'message': 'Session resumed'
         }
     except Exception as e:
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR

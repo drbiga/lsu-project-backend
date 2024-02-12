@@ -6,17 +6,17 @@ hostname = os.getenv('HOSTNAME')
 if hostname is None:
     hostname = '127.0.0.1'
 
+is_passthrough = [True, True, False, False, False,
+                  True, True, False, False, False]
+
 def create_session(seq_number: int):
-    read_comps = [
-        'https://redcap.rwjms.rutgers.edu/surveys/?s=Y8XAM78DD4883XDA'
-        for _ in range(10)
-    ]
+    redcap_link = 'https://redcap.rwjms.rutgers.edu/surveys/?s=TAT7LTH8MJLYLT84'
     url = f'http://{hostname}:8000/sessions'
     params = {
         'seq_number': seq_number,
-        'read_comp_link': read_comps[seq_number-1],
-        'survey_link': 'https://redcap.rwjms.rutgers.edu/surveys/?s=Y8XAM78DD4883XDA',
-        'is_passthrough': seq_number % 2 == 0
+        'read_comp_link': redcap_link,
+        'survey_link': redcap_link,
+        'is_passthrough': is_passthrough[seq_number -1]
     }
     requests.post(url, params=params)
 
