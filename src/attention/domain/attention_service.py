@@ -8,6 +8,8 @@ class AttentionService:
         self.attentions = []
 
     def get_current_attention(self) -> Attention:
+        if len(self.attentions) == 0:
+            return -1
         return self.attentions[-1]
 
     def save_attention(self, attention: Attention) -> None:

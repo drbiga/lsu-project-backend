@@ -1,7 +1,8 @@
 from pydantic import BaseModel
 from typing import List, Optional
 
-from student.domain.session_execution import SessionExecution, PointData
+from student.domain.session_execution import SessionExecution
+from attention.domain.attention import Attention
 
 class Student(BaseModel):
     name: str
@@ -21,9 +22,9 @@ class Student(BaseModel):
         # Recording is always done to the last executing session
         self.session_executions[-1].record_micro_feedback(feedback)
 
-    def record_second_wise_data(self, point_data: PointData) -> None:
+    def record_raw_attention_data(self, attention_data: Attention) -> None:
         # Recording is always done to the last executing session
-        self.session_executions[-1].record_second_wise_data(point_data)
+        self.session_executions[-1].record_raw_attention_data(attention_data)
 
     def set_survey_queue_link(self, link: str) -> None:
         self.survey_queue_link = link

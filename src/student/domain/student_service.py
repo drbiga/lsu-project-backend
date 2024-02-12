@@ -48,7 +48,7 @@ class StudentService:
         self.feedback_monitoring_thread.start()
 
         self.attention_monitoring_thread = Thread(
-            target=lambda: self.__start_recording_second_wise_data(attention_service, session_service)
+            target=lambda: self.__start_recording_raw_attention_data(attention_service, session_service)
         )
         self.attention_monitoring_thread.start()
 
@@ -92,7 +92,7 @@ class StudentService:
         # the session execution history
         self.repository.save(self.current_student)
 
-    def __start_recording_second_wise_data(
+    def __start_recording_raw_attention_data(
             self,
             attention_service: AttentionService,
             session_service: SessionService,
@@ -107,9 +107,9 @@ class StudentService:
             time.sleep(0.5)
 
         while not session.session_part == SessionPart.FINISHED:
-            time.sleep(1)
+            time.sleep(60)
             attention = attention_service.get_current_attention()
-            self.current_student.record_second_wise_data(attention)
+            self.current_student.record_raw_attention_data(attention)
 
         self.repository.save(self.current_student)
 
