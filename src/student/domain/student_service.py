@@ -82,9 +82,8 @@ class StudentService:
                 micro_feedbacks.clear()
                 self.current_student.record_macro_feedback(macro_feedback)
         
-        # After collecting feedback, save the student with all
-        # the session execution history
-        self.repository.save(self.current_student)
+            # Saving the feedback every time so we don't lose any data
+            self.repository.save(self.current_student)
 
     def get_student(self, student_name: str) -> Student:
         return self.repository.load(student_name)
