@@ -123,6 +123,7 @@ class StudentService:
         return self.current_student
 
     def set_student_survey_queue_link(self, student_name: str, survey_queue_link: str) -> None:
-        student = self.repository.load(student_name)
+        # student = self.repository.load(student_name)
+        student = self.current_student
         student.set_survey_queue_link(survey_queue_link)
         self.repository.save(student)
