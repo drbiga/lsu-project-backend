@@ -1,18 +1,18 @@
 import shelve
 
 
-def fix():
+def fix(name: str):
 	with shelve.open('data/students.shelve') as db:
-		amy = db['amy']
-		sessions = amy['session_executions']
+		student = db[name]
+		sessions = student['session_executions']
 		sessions.pop()
-		db['amy'] = amy
+		db[name] = student
 
-def check():
+def check(name: str):
 	with shelve.open('data/students.shelve') as db:
-		amy = db['amy']
+		student = db[name]
 
-		print(amy)
+		print(student)
 
-
-check()
+# fix('callen')
+check('callen')

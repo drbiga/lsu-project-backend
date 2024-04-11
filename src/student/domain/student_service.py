@@ -124,6 +124,8 @@ class StudentService:
 
     def set_student_survey_queue_link(self, student_name: str, survey_queue_link: str) -> None:
         # student = self.repository.load(student_name)
+        # Set survey queue link should be executed after starting a session. Therefore,
+        # the current student is not none
         student = self.current_student
         student.set_survey_queue_link(survey_queue_link)
         self.repository.save(student)
