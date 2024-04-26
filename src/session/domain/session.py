@@ -25,6 +25,7 @@ class Session:
         # Could prevent bugs where they press the button multiple times and have
         # multiple homework/post-session survey times.
         self.has_resumed = False
+        self.break_timer = False
 
         self.session_part = SessionPart.WAITING_START.value
         self.timer = Session.TIME_SECONDS_READ_COMP
@@ -52,6 +53,12 @@ class Session:
             self.timer -= 1
             self.notify()
             time.sleep(1)
+            if self.break_timer:
+                self.break_timer = False
+                break
+    
+    def stop_timer(self):
+        self.break_timer = True
 
     def start(self) -> None:
         # Wait until observer has attached (web application)

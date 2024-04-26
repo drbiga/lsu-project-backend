@@ -60,6 +60,7 @@ class SessionService:
         pressed the Continue button upon submitting the Read-Comp survey
         """
         if not self.executing_session.has_resumed:
+            self.executing_session.stop_timer()
             session_worker = Thread(target=lambda: self.executing_session.enter_homework())
             session_worker.start()
 
