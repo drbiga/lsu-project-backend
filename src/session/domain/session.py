@@ -6,7 +6,7 @@ from session.domain.session_part import SessionPart
 from session.domain.session_observer import SessionObserver
 
 class Session:
-    TIME_SECONDS_READ_COMP = 10 * 60
+    TIME_SECONDS_READ_COMP = 10#10 * 60
     TIME_SECONDS_HOMEWORK = 40 * 60
     TIME_SECONDS_SURVEY = 10 * 60
 
@@ -29,6 +29,7 @@ class Session:
 
         self.session_part = SessionPart.WAITING_START.value
         self.timer = Session.TIME_SECONDS_READ_COMP
+        self.timer_is_running = False
 
     # ---------------------------------------------------------------------------------
     # Subject methods
@@ -49,6 +50,7 @@ class Session:
     # Domain methods
     def run_timer(self) -> None:
         # At every timer tick, we emit an update to the observersf
+        self.timer_is_running = True
         while self.timer > 0:
             self.timer -= 1
             self.notify()
@@ -56,6 +58,8 @@ class Session:
             if self.break_timer:
                 self.break_timer = False
                 break
+        self.timer_is_running = False
+        
     
     def stop_timer(self):
         self.break_timer = True
